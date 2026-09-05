@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Damped Harmonic Oscillation Lab | Interactive Physics & Graphing</title>
+  <meta name="description" content="Interactive visualization and analysis of damped harmonic oscillations covering underdamping, critical damping, and overdamping as per the governing differential equation.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12c2.5-8 5-8 7.5 0s5 8 7.5 0 3-4 5-4" />
+          </svg>
+        </div>
+        <div>
+          <h1>Damped Harmonic Oscillation Lab</h1>
+          <p class="subtitle">Exploring Restoring Forces, Damping Forces & Dynamic Regimes</p>
+        </div>
+      </div>
+
+      <!-- Mode Selector Pills -->
+      <nav class="mode-selector" aria-label="Oscillation Damping Regimes">
+        <button id="modeUnder" class="mode-btn active" data-mode="underdamped" title="beta < omega_0 (Oscillatory decay)">
+          <span class="mode-indicator under"></span>
+          <span class="mode-text">Underdamped</span>
+          <span class="mode-cond">&beta; &lt; &omega;₀</span>
+        </button>
+        <button id="modeCritical" class="mode-btn" data-mode="critical" title="beta = omega_0 (Fastest non-oscillatory return)">
+          <span class="mode-indicator critical"></span>
+          <span class="mode-text">Critically Damped</span>
+          <span class="mode-cond">&beta; = &omega;₀</span>
+        </button>
+        <button id="modeOver" class="mode-btn" data-mode="overdamped" title="beta > omega_0 (Sluggish exponential return)">
+          <span class="mode-indicator over"></span>
+          <span class="mode-text">Overdamped</span>
+          <span class="mode-cond">&beta; &gt; &omega;₀</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="main-grid">
+      <!-- Left Sidebar: Controls & Parameter Tuning -->
+      <aside class="sidebar-panel">
+        <div class="panel-header">
+          <h2>System Parameters</h2>
+          <button id="resetParamsBtn" class="icon-action-btn" title="Reset to Mode Defaults">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            Reset
+          </button>
+        </div>
+
+        <!-- Parameter Controls Section -->
+        <div class="control-groups-container">
+          <!-- Direct Equation Parameters -->
+          <div class="control-section">
+            <div class="section-title">
+              <span class="badge blue">Equation Components</span>
+            </div>
+
+            <!-- Damping Constant beta -->
+            <div class="control-row">
+              <div class="label-row">
+                <label for="sliderBeta">
+                  <strong>&beta;</strong> (Damping Constant)
+                  <span class="formula-hint">&beta; = b / (2m)</span>
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="inputBeta" min="0" max="20" step="0.05" value="0.30">
+                  <span class="unit">s⁻¹</span>
+                </div>
+              </div>
+              <input type="range" id="sliderBeta" min="0" max="10" step="0.02" value="0.30" class="styled-slider beta-slider">
+            </div>
+
+            <!-- Undamped Natural Frequency omega_0 -->
+            <div class="control-row">
+              <div class="label-row">
+                <label for="sliderOmega0">
+                  <strong>&omega;₀</strong> (Natural Angular Frequency)
+                  <span class="formula-hint">&omega;₀ = &radic;(k / m)</span>
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="inputOmega0" min="0.1" max="25" step="0.1" value="2.0">
+                  <span class="unit">rad/s</span>
+                </div>
+              </div>
+              <input type="range" id="sliderOmega0" min="0.2" max="15" step="0.1" value="2.0" class="styled-slider omega-slider">
+            </div>
+
+            <!-- Initial Maximum Amplitude A -->
+            <div class="control-row">
+              <div class="label-row">
+                <label for="sliderA">
+                  <strong>A</strong> (Initial Amplitude)
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="inputA" min="-10" max="10" step="0.1" value="4.0">
+                  <span class="unit">m</span>
+                </div>
+              </div>
+              <input type="range" id="sliderA" min="0.5" max="8.0" step="0.1" value="4.0" class="styled-slider">
+            </div>
+
+            <!-- Initial Phase Angle phi -->
+            <div class="control-row">
+              <div class="label-row">
+                <label for="sliderPhi">
+                  <strong>&phi;</strong> (Initial Phase Angle)
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="inputPhi" min="-3.14" max="3.14" step="0.05" value="0.00">
+                  <span class="unit">rad</span>
+                </div>
+              </div>
+              <input type="range" id="sliderPhi" min="-3.14" max="3.14" step="0.05" value="0.00" class="styled-slider">
+            </div>
+
+            <!-- Quick Action: Auto-set to Critical -->
+            <button id="snapToCriticalBtn" class="action-btn secondary" title="Instantly set beta = omega_0">
+              <span class="btn-icon">&target;</span> Snap &beta; to Critical (&omega;₀)
+            </button>
+          </div>
+
+          <!-- Underlying Physical Parameters (Mass, Spring Constant, Damping Coeff) Accordion -->
+          <details class="control-accordion" open>
+            <summary class="accordion-header">
+              <span>Physical Components (m, b, k)</span>
+              <span class="accordion-arrow">&rsaquo;</span>
+            </summary>
+            <div class="accordion-body">
+              <!-- Mass m -->
+              <div class="control-row compact">
+                <div class="label-row">
+                  <label for="sliderM">Mass <strong>m</strong></label>
+                  <div class="input-with-unit">
+                    <input type="number" id="inputM" min="0.1" max="20" step="0.1" value="1.0">
+                    <span class="unit">kg</span>
+                  </div>
+                </div>
+                <input type="range" id="sliderM" min="0.2" max="10" step="0.1" value="1.0" class="styled-slider">
+              </div>
+
+              <!-- Damping Coeff b -->
+              <div class="control-row compact">
+                <div class="label-row">
+                  <label for="sliderB">Damping Coeff <strong>b</strong></label>
+                  <div class="input-with-unit">
+                    <input type="number" id="inputB" min="0" max="50" step="0.1" value="0.6">
+                    <span class="unit">N&middot;s/m</span>
+                  </div>
+                </div>
+                <input type="range" id="sliderB" min="0" max="40" step="0.1" value="0.6" class="styled-slider">
+              </div>
+
+              <!-- Spring Constant k -->
+              <div class="control-row compact">
+                <div class="label-row">
+                  <label for="sliderK">Spring Constant <strong>k</strong></label>
+                  <div class="input-with-unit">
+                    <input type="number" id="inputK" min="0.1" max="100" step="0.5" value="4.0">
+                    <span class="unit">N/m</span>
+                  </div>
+                </div>
+                <input type="range" id="sliderK" min="0.5" max="50" step="0.5" value="4.0" class="styled-slider">
+              </div>
+            </div>
+          </details>
+
+          <!-- Display & View Options -->
+          <div class="control-section">
+            <div class="section-title">
+              <span class="badge purple">Graph Curves & View</span>
+            </div>
+
+            <div class="toggle-list">
+              <label class="toggle-item">
+                <input type="checkbox" id="toggleEnvelope" checked>
+                <span class="custom-check"></span>
+                <span class="toggle-label">
+                  <span class="color-dot envelope-dot"></span>
+                  Amplitude Envelope (&plusmn;A e<sup>-&beta;t</sup>)
+                </span>
+              </label>
+
+              <label class="toggle-item">
+                <input type="checkbox" id="toggleRestoringForce" checked>
+                <span class="custom-check"></span>
+                <span class="toggle-label">
+                  <span class="color-dot restoring-dot"></span>
+                  Restoring Force F<sub>k</sub> = -kx
+                </span>
+              </label>
+
+              <label class="toggle-item">
+                <input type="checkbox" id="toggleDampingForce" checked>
+                <span class="custom-check"></span>
+                <span class="toggle-label">
+                  <span class="color-dot damping-dot"></span>
+                  Damping Force F<sub>b</sub> = -bv
+                </span>
+              </label>
+
+              <label class="toggle-item">
+                <input type="checkbox" id="toggleVelocity">
+                <span class="custom-check"></span>
+                <span class="toggle-label">
+                  <span class="color-dot velocity-dot"></span>
+                  Velocity v(t) = dx/dt
+                </span>
+              </label>
+
+              <label class="toggle-item highlight-toggle">
+                <input type="checkbox" id="toggleCompareAll">
+                <span class="custom-check"></span>
+                <span class="toggle-label">
+                  <span class="color-dot compare-dot"></span>
+                  Compare All 3 Modes Side-by-Side
+                </span>
+              </label>
+            </div>
+
+            <!-- Time Window Slider -->
+            <div class="control-row compact mt-2">
+              <div class="label-row">
+                <label for="sliderTmax">Time Horizon (t<sub>max</sub>)</label>
+                <div class="input-with-unit">
+                  <input type="number" id="inputTmax" min="5" max="60" step="1" value="16">
+                  <span class="unit">s</span>
+                </div>
+              </div>
+              <input type="range" id="sliderTmax" min="5" max="50" step="1" value="16" class="styled-slider">
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center & Right: Visualizations & Analytics -->
+      <div class="visualization-column">
+        <!-- Top Banner: Differential Equation and Current Analytical Formula -->
+        <section class="formula-banner">
+          <div class="formula-block main-de">
+            <div class="formula-tag">Differential Equation of Motion</div>
+            <div class="math-expr" id="deDisplay">
+              <span class="math-term">d²x/dt²</span> + 
+              <span class="math-term highlight-beta">2&beta; dx/dt</span> + 
+              <span class="math-term highlight-omega0">&omega;₀² x</span> = 0
+            </div>
+            <div class="formula-subtext" id="deNumericDisplay">
+              d²x/dt² + 0.60&middot;(dx/dt) + 4.00&middot;x = 0
+            </div>
+          </div>
+
+          <div class="formula-block solution-block">
+            <div class="formula-tag">Current Analytical Solution x(t)</div>
+            <div class="math-expr solution-expr" id="solutionDisplay">
+              x(t) = A &middot; e<sup>-&beta;t</sup> &middot; cos(&omega;t + &phi;)
+            </div>
+            <div class="formula-subtext" id="solutionNumericDisplay">
+              x(t) = 4.00 &middot; e<sup>-0.30t</sup> &middot; cos(1.98t)
+            </div>
+          </div>
+
+          <div class="formula-status-pill" id="dampingRegimeBadge">
+            <span class="status-dot"></span>
+            <span id="regimeTitle">Underdamped Regime</span>
+            <span id="regimeSub">&beta; (0.30) &lt; &omega;₀ (2.00)</span>
+          </div>
+        </section>
+
+        <!-- Main Chart Card -->
+        <section class="chart-card">
+          <div class="chart-toolbar">
+            <div class="chart-title-group">
+              <h3 id="graphMainHeading">Oscillation Waveform & Force Dynamics</h3>
+              <span class="graph-subtitle">Time vs. Displacement x(t), Envelopes, & Opposing Forces</span>
+            </div>
+
+            <div class="view-mode-tabs">
+              <button id="viewTimeDomain" class="view-tab-btn active">Time Domain x(t)</button>
+              <button id="viewPhaseSpace" class="view-tab-btn">Phase Portrait (v vs x)</button>
+            </div>
+
+            <div class="chart-actions">
+              <button id="exportPngBtn" class="toolbar-btn" title="Download High-Res Graph as PNG">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                PNG
+              </button>
+              <button id="exportCsvBtn" class="toolbar-btn" title="Export Coordinates & Forces to CSV">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="canvas-wrapper" id="canvasWrapper">
+            <canvas id="graphCanvas"></canvas>
+
+            <!-- Floating Crosshair Info Tooltip -->
+            <div id="graphTooltip" class="graph-tooltip">
+              <div class="tooltip-header" id="ttTime">t = 0.00 s</div>
+              <div class="tooltip-grid">
+                <div class="tt-item tt-x">
+                  <span class="tt-lbl">x(t):</span>
+                  <span class="tt-val" id="ttValX">0.00 m</span>
+                </div>
+                <div class="tt-item tt-v">
+                  <span class="tt-lbl">v(t):</span>
+                  <span class="tt-val" id="ttValV">0.00 m/s</span>
+                </div>
+                <div class="tt-item tt-fk">
+                  <span class="tt-lbl">F<sub>restoring</sub>:</span>
+                  <span class="tt-val" id="ttValFk">0.00 N</span>
+                </div>
+                <div class="tt-item tt-fb">
+                  <span class="tt-lbl">F<sub>damping</sub>:</span>
+                  <span class="tt-val" id="ttValFb">0.00 N</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Graph Legend -->
+          <div class="chart-legend" id="chartLegend">
+            <div class="legend-item" id="legDisplacement">
+              <span class="legend-line line-x"></span>
+              <span>Displacement x(t)</span>
+            </div>
+            <div class="legend-item" id="legEnvelope">
+              <span class="legend-line line-env"></span>
+              <span>Envelopes &plusmn;A e<sup>-&beta;t</sup></span>
+            </div>
+            <div class="legend-item" id="legRestoring">
+              <span class="legend-line line-fk"></span>
+              <span>Restoring Force F<sub>k</sub> = -kx</span>
+            </div>
+            <div class="legend-item" id="legDamping">
+              <span class="legend-line line-fb"></span>
+              <span>Damping Force F<sub>b</sub> = -bv</span>
+            </div>
+            <div class="legend-item" id="legVelocity" style="display:none;">
+              <span class="legend-line line-v"></span>
+              <span>Velocity v(t)</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bottom Row: Physical Simulation & Live Physics Metrics -->
+        <div class="simulation-metrics-grid">
+          <!-- Physical Animation: Spring-Mass-Dashpot System -->
+          <section class="simulation-card">
+            <div class="sim-header">
+              <div class="sim-title">
+                <h3>Spring-Mass-Dashpot Apparatus</h3>
+                <span class="sim-subtitle">Simultaneous mechanical motion & opposing forces</span>
+              </div>
+              <!-- Playback Controls -->
+              <div class="sim-controls">
+                <button id="playPauseBtn" class="ctrl-icon-btn primary" title="Play / Pause Simulation">
+                  <svg id="playIcon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <svg id="pauseIcon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="display:none;">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                  </svg>
+                </button>
+                <button id="resetSimBtn" class="ctrl-icon-btn" title="Rewind to t=0">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                  </svg>
+                </button>
+                <div class="speed-selector">
+                  <button class="speed-btn" data-speed="0.5">0.5x</button>
+                  <button class="speed-btn active" data-speed="1.0">1x</button>
+                  <button class="speed-btn" data-speed="2.0">2x</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulation Canvas -->
+            <div class="sim-canvas-container">
+              <canvas id="simCanvas"></canvas>
+            </div>
+
+            <!-- Time Scrubber -->
+            <div class="scrubber-bar">
+              <span class="scrub-label">Current Time: <strong id="simCurrentTimeDisplay">0.00 s</strong></span>
+              <input type="range" id="timeScrubber" min="0" max="16" step="0.02" value="0" class="time-slider">
+              <span class="scrub-total" id="simMaxTimeDisplay">16.0 s</span>
+            </div>
+
+            <!-- Vector Legend -->
+            <div class="vector-legend">
+              <span class="vector-tag tag-k"><span class="tag-arrow">&rarr;</span> Restoring Force F<sub>k</sub></span>
+              <span class="vector-tag tag-b"><span class="tag-arrow">&rarr;</span> Damping Force F<sub>b</sub></span>
+              <span class="vector-tag tag-v"><span class="tag-arrow">&rarr;</span> Velocity v</span>
+            </div>
+          </section>
+
+          <!-- Dynamic Physics Metrics Cards -->
+          <section class="metrics-card">
+            <div class="metrics-header">
+              <h3>Live Oscillator Telemetry</h3>
+              <span class="metrics-subtitle">Derived frequencies, coefficients & decay metrics</span>
+            </div>
+
+            <div class="metrics-dashboard">
+              <!-- Metric: Damping Ratio zeta -->
+              <div class="metric-box" id="boxZeta">
+                <div class="metric-top">
+                  <span class="metric-symbol">&zeta;</span>
+                  <span class="metric-name">Damping Ratio</span>
+                </div>
+                <div class="metric-value" id="valZeta">0.150</div>
+                <div class="metric-desc" id="descZeta">&zeta; = &beta; / &omega;₀ &lt; 1 (Underdamped)</div>
+              </div>
+
+              <!-- Metric: Damped Frequency omega -->
+              <div class="metric-box" id="boxOmega">
+                <div class="metric-top">
+                  <span class="metric-symbol">&omega;</span>
+                  <span class="metric-name">Damped Angular Freq</span>
+                </div>
+                <div class="metric-value" id="valOmega">1.977 <small>rad/s</small></div>
+                <div class="metric-desc" id="descOmega">&radic;(&omega;₀² - &beta;²)</div>
+              </div>
+
+              <!-- Metric: Natural Frequency omega_0 -->
+              <div class="metric-box">
+                <div class="metric-top">
+                  <span class="metric-symbol">&omega;₀</span>
+                  <span class="metric-name">Natural Angular Freq</span>
+                </div>
+                <div class="metric-value" id="valOmega0">2.000 <small>rad/s</small></div>
+                <div class="metric-desc">&radic;(k / m)</div>
+              </div>
+
+              <!-- Metric: Damped Period T -->
+              <div class="metric-box" id="boxPeriod">
+                <div class="metric-top">
+                  <span class="metric-symbol">T<sub>d</sub></span>
+                  <span class="metric-name">Oscillation Period</span>
+                </div>
+                <div class="metric-value" id="valPeriod">3.178 <small>s</small></div>
+                <div class="metric-desc">2&pi; / &omega;</div>
+              </div>
+
+              <!-- Metric: Decay Time Constant tau -->
+              <div class="metric-box">
+                <div class="metric-top">
+                  <span class="metric-symbol">&tau;</span>
+                  <span class="metric-name">Decay Time Constant</span>
+                </div>
+                <div class="metric-value" id="valTau">3.333 <small>s</small></div>
+                <div class="metric-desc" id="descTau">1 / &beta; (e⁻¹ decay)</div>
+              </div>
+
+              <!-- Metric: Critical Damping Coeff bc -->
+              <div class="metric-box">
+                <div class="metric-top">
+                  <span class="metric-symbol">b<sub>crit</sub></span>
+                  <span class="metric-name">Critical Damping Coeff</span>
+                </div>
+                <div class="metric-value" id="valBcrit">4.000 <small>N&middot;s/m</small></div>
+                <div class="metric-desc">2&radic;(m&middot;k)</div>
+              </div>
+            </div>
+
+            <!-- Educational Comparison Card -->
+            <div class="regime-explanation-box" id="regimeExplanation">
+              <h4 id="explainTitle">Why Underdamping Occurs</h4>
+              <p id="explainBody">
+                Here, the damping constant <strong>&beta;</strong> is smaller than the natural angular frequency <strong>&omega;₀</strong> (&beta; &lt; &omega;₀). The restoring force (spring) is strong enough to repeatedly pull the mass past equilibrium, while the damping force progressively extracts kinetic energy, forming decaying sinusoidal oscillations contained within the exponential envelope &plusmn;A e<sup>-&beta;t</sup>.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div>
+        Differential Equation: <code>d²x/dt² + 2&beta;(dx/dt) + &omega;₀²x = 0</code> &bull; Standard Physical Form: <code>m(d²x/dt²) + b(dx/dt) + kx = 0</code>
+      </div>
+      <div>
+        Interactive Harmonic Oscillation Laboratory &bull; Standalone HTML5 / CSS3 / Vanilla JS Engine
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
