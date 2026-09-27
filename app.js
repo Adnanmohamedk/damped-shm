@@ -451,10 +451,12 @@
   }
 
   function renderTimeDomainGraph(width, height) {
-    const padLeft = 55;
-    const padRight = 30;
-    const padTop = 25;
-    const padBottom = 35;
+    const isSmallMobile = width < 380;
+    const isMobile = width < 500;
+    const padLeft = isSmallMobile ? 38 : (isMobile ? 46 : 55);
+    const padRight = isSmallMobile ? 12 : (isMobile ? 18 : 30);
+    const padTop = isMobile ? 20 : 25;
+    const padBottom = isMobile ? 30 : 35;
     const plotWidth = width - padLeft - padRight;
     const plotHeight = height - padTop - padBottom;
 
@@ -480,7 +482,7 @@
     graphCtx.lineWidth = 1;
 
     // Time Vertical Gridlines & Labels
-    const numTimeSteps = Math.min(10, Math.floor(tMax / 2));
+    const numTimeSteps = Math.min(width < 450 ? 5 : 10, Math.floor(tMax / 2));
     const dtGrid = tMax / numTimeSteps;
     graphCtx.font = '11px ui-monospace, SFMono-Regular, monospace';
     graphCtx.fillStyle = '#64748b';
@@ -728,18 +730,21 @@
     graphCtx.stroke();
     graphCtx.restore();
 
-    // Badge Overlay in canvas
-    graphCtx.fillStyle = 'rgba(10, 14, 23, 0.8)';
-    graphCtx.fillRect(toPxX(tMax * 0.6), 35, 180, 68);
+    // Badge Overlay in canvas - positioned responsively
+    const badgeW = Math.min(180, width - 60);
+    const badgeH = 68;
+    const badgeX = Math.max(padLeft + 10, Math.min(toPxX(tMax * 0.55), width - badgeW - 15));
+    graphCtx.fillStyle = 'rgba(10, 14, 23, 0.85)';
+    graphCtx.fillRect(badgeX, 35, badgeW, badgeH);
     graphCtx.strokeStyle = '#28374f';
-    graphCtx.strokeRect(toPxX(tMax * 0.6), 35, 180, 68);
-    graphCtx.font = '11px sans-serif';
+    graphCtx.strokeRect(badgeX, 35, badgeW, badgeH);
+    graphCtx.font = width < 450 ? '10px sans-serif' : '11px sans-serif';
     graphCtx.fillStyle = '#38bdf8';
-    graphCtx.fillText('— Underdamped (β = 0.25ω₀)', toPxX(tMax * 0.6) + 12, 54);
+    graphCtx.fillText('— Underdamped (β = 0.25ω₀)', badgeX + 10, 54);
     graphCtx.fillStyle = '#f59e0b';
-    graphCtx.fillText('— Critically Damped (β = ω₀)', toPxX(tMax * 0.6) + 12, 72);
+    graphCtx.fillText('— Critically Damped (β = ω₀)', badgeX + 10, 72);
     graphCtx.fillStyle = '#ec4899';
-    graphCtx.fillText('— Overdamped (β = 2.5ω₀)', toPxX(tMax * 0.6) + 12, 90);
+    graphCtx.fillText('— Overdamped (β = 2.5ω₀)', badgeX + 10, 90);
   }
 
   function drawTracerDot(toPxX, toPxY, zeroY, padTop, bottomY) {
@@ -1187,13 +1192,23 @@
 
   // --- Graph Interaction & Tooltip ---
 
-  function handleGraphMouseMove(e) {
-    const rect = elements.graphCanvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+  function getEventCoords(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+    }
+    return { clientX: e.clientX, clientY: e.clientY };
+  }
 
-    const padLeft = 55;
-    const padRight = 30;
+  function handleGraphMouseMove(e) {
+    const coords = getEventCoords(e);
+    const rect = elements.graphCanvas.getBoundingClientRect();
+    const mouseX = coords.clientX - rect.left;
+    const mouseY = coords.clientY - rect.top;
+
+    const isSmallMobile = rect.width < 380;
+    const isMobile = rect.width < 500;
+    const padLeft = isSmallMobile ? 38 : (isMobile ? 46 : 55);
+    const padRight = isSmallMobile ? 12 : (isMobile ? 18 : 30);
     const plotWidth = rect.width - padLeft - padRight;
 
     if (mouseX >= padLeft && mouseX <= rect.width - padRight) {
@@ -1213,6 +1228,13 @@
       elements.graphTooltip.style.display = 'block';
       elements.graphTooltip.style.left = `${mouseX}px`;
       elements.graphTooltip.style.top = `${mouseY}px`;
+
+      // Flip tooltip horizontally if close to the right edge to prevent overflow
+      if (mouseX > rect.width - 150) {
+        elements.graphTooltip.style.transform = 'translate(-105%, -50%)';
+      } else {
+        elements.graphTooltip.style.transform = 'translate(12px, -50%)';
+      }
     } else {
       handleGraphMouseLeave();
     }
@@ -1447,10 +1469,27 @@
       });
     });
 
-    // Tooltip & Crosshairs
+    // Tooltip & Crosshairs (Mouse & Touch for phones/tablets)
     elements.canvasWrapper.addEventListener('mousemove', handleGraphMouseMove);
     elements.canvasWrapper.addEventListener('mouseleave', handleGraphMouseLeave);
     elements.canvasWrapper.addEventListener('click', handleGraphClick);
+
+    elements.canvasWrapper.addEventListener('touchstart', (e) => {
+      handleGraphMouseMove(e);
+    }, { passive: true });
+
+    elements.canvasWrapper.addEventListener('touchmove', (e) => {
+      handleGraphMouseMove(e);
+    }, { passive: true });
+
+    elements.canvasWrapper.addEventListener('touchend', () => {
+      if (state.hoverT !== null) {
+        state.currentTime = state.hoverT;
+        elements.timeScrubber.value = state.currentTime;
+        elements.simCurrentTimeDisplay.textContent = state.currentTime.toFixed(2) + ' s';
+      }
+      setTimeout(handleGraphMouseLeave, 2500);
+    });
 
     // Export Buttons
     elements.exportPngBtn.addEventListener('click', exportGraphPng);
