@@ -62,6 +62,7 @@ body {
     radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.04) 0%, transparent 40%),
     radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 40%);
   background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 .app-container {
@@ -69,6 +70,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   max-width: 1720px;
+  width: 100%;
   margin: 0 auto;
   padding: 16px 24px 20px 24px;
   gap: 16px;
@@ -104,6 +106,7 @@ body {
   justify-content: center;
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2));
   color: var(--color-displacement);
@@ -203,12 +206,6 @@ body {
   grid-template-columns: 360px minmax(0, 1fr);
   gap: 16px;
   flex: 1;
-}
-
-@media (max-width: 1100px) {
-  .main-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ==========================================================================
@@ -607,16 +604,11 @@ body {
   align-items: center;
 }
 
-@media (max-width: 900px) {
-  .formula-banner {
-    grid-template-columns: 1fr;
-  }
-}
-
 .formula-block {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .formula-tag {
@@ -632,6 +624,9 @@ body {
   font-size: 1.08rem;
   letter-spacing: 0.02em;
   color: #fff;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .solution-expr {
@@ -825,6 +820,8 @@ body {
   z-index: 10;
   transform: translate(12px, -50%);
   min-width: 140px;
+  max-width: calc(100% - 24px);
+  transition: transform 0.1s ease;
 }
 
 .tooltip-header {
@@ -891,12 +888,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-}
-
-@media (max-width: 1200px) {
-  .simulation-metrics-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Physical Simulation Card */
@@ -1107,12 +1098,6 @@ body {
   gap: 10px;
 }
 
-@media (max-width: 600px) {
-  .metrics-dashboard {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 .metric-box {
   background: rgba(10, 14, 23, 0.6);
   border: 1px solid var(--border-subtle);
@@ -1214,4 +1199,582 @@ body {
   border-radius: 4px;
   color: var(--text-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ==========================================================================
+   Responsive Architecture: Devices, Laptops, Tablets & Phones
+   Utilizing CSS '@media screen and (...)' with conditions for all viewports
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Ultra-Wide Screens & Large Desktop Displays (min-width: 1440px)
+   -------------------------------------------------------------------------- */
+@media screen and (min-width: 1440px) {
+  .app-container {
+    max-width: 1800px;
+    padding: 20px 32px;
+    gap: 18px;
+  }
+
+  .main-grid {
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .canvas-wrapper {
+    height: 420px;
+  }
+
+  .sim-canvas-container {
+    height: 180px;
+  }
+
+  .formula-banner {
+    grid-template-columns: 1.3fr 1.6fr auto;
+    padding: 16px 24px;
+    gap: 20px;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Standard Laptops & Notebooks (min-width: 1025px) and (max-width: 1439px)
+   -------------------------------------------------------------------------- */
+@media screen and (min-width: 1025px) and (max-width: 1439px) {
+  .app-container {
+    padding: 14px 20px;
+    gap: 14px;
+  }
+
+  .main-grid {
+    grid-template-columns: 330px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .sidebar-panel {
+    padding: 16px;
+    max-height: calc(100vh - 110px);
+  }
+
+  .canvas-wrapper {
+    height: 360px;
+  }
+
+  .sim-canvas-container {
+    height: 155px;
+  }
+
+  .formula-banner {
+    grid-template-columns: 1.2fr 1.4fr auto;
+    gap: 12px;
+    padding: 12px 18px;
+  }
+
+  .math-expr {
+    font-size: 1rem;
+  }
+
+  .simulation-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .metrics-dashboard {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .metric-box {
+    padding: 8px 10px;
+  }
+
+  .metric-value {
+    font-size: 1.08rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Small Laptops, Netbooks & Tablets Landscape (min-width: 769px) and (max-width: 1024px)
+   -------------------------------------------------------------------------- */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .app-container {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .app-header {
+    padding: 10px 16px;
+  }
+
+  .app-header h1 {
+    font-size: 1.15rem;
+  }
+
+  .mode-btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .sidebar-panel {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .formula-banner {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .formula-status-pill {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+  }
+
+  .canvas-wrapper {
+    height: 340px;
+  }
+
+  .simulation-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .sim-canvas-container {
+    height: 160px;
+  }
+
+  .metrics-dashboard {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Tablets (Portrait) & Large Mobile Phones (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 768px) {
+  .app-container {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .header-brand {
+    justify-content: flex-start;
+  }
+
+  .mode-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    gap: 3px;
+  }
+
+  .mode-btn {
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 4px;
+    text-align: center;
+    justify-content: center;
+    font-size: 0.76rem;
+  }
+
+  .mode-cond {
+    font-size: 0.68rem;
+    padding: 1px 4px;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sidebar-panel {
+    max-height: none;
+    overflow-y: visible;
+    padding: 16px 14px;
+  }
+
+  .formula-banner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .formula-status-pill {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+
+  .chart-card {
+    padding: 14px 14px;
+  }
+
+  .chart-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .chart-title-group {
+    width: 100%;
+  }
+
+  .view-mode-tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .view-tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 8px;
+    font-size: 0.74rem;
+  }
+
+  .chart-actions {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .toolbar-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 7px 8px;
+  }
+
+  .canvas-wrapper {
+    height: 300px;
+  }
+
+  .chart-legend {
+    gap: 10px 14px;
+    font-size: 0.74rem;
+  }
+
+  .simulation-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .simulation-card {
+    padding: 14px 14px;
+  }
+
+  .sim-canvas-container {
+    height: 150px;
+  }
+
+  .metrics-card {
+    padding: 14px 14px;
+  }
+
+  .metrics-dashboard {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
+    font-size: 0.72rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Mobile Phones (max-width: 576px)
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 576px) {
+  .app-container {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .app-header h1 {
+    font-size: 1.05rem;
+  }
+
+  .subtitle {
+    font-size: 0.72rem;
+  }
+
+  .mode-btn {
+    padding: 6px 3px;
+    font-size: 0.72rem;
+    gap: 2px;
+  }
+
+  .mode-indicator {
+    width: 6px;
+    height: 6px;
+  }
+
+  .mode-cond {
+    font-size: 0.64rem;
+    padding: 1px 3px;
+  }
+
+  .math-expr {
+    font-size: 0.95rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .solution-expr {
+    font-size: 0.95rem;
+  }
+
+  .formula-subtext {
+    font-size: 0.72rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .canvas-wrapper {
+    height: 260px;
+  }
+
+  .chart-legend {
+    gap: 8px 10px;
+    font-size: 0.7rem;
+  }
+
+  .legend-line {
+    width: 14px;
+  }
+
+  .sim-canvas-container {
+    height: 140px;
+  }
+
+  .sim-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .sim-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .scrubber-bar {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .time-slider {
+    width: 100%;
+    order: 3;
+  }
+
+  .scrub-label {
+    order: 1;
+    font-size: 0.72rem;
+  }
+
+  .scrub-total {
+    order: 2;
+    margin-left: auto;
+    font-size: 0.72rem;
+  }
+
+  .metrics-dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .metric-box {
+    padding: 8px;
+  }
+
+  .metric-value {
+    font-size: 1.05rem;
+  }
+
+  .metric-name {
+    font-size: 0.64rem;
+  }
+
+  .metric-desc {
+    font-size: 0.62rem;
+  }
+
+  .sidebar-panel {
+    padding: 12px;
+  }
+
+  .label-row {
+    font-size: 0.8rem;
+  }
+
+  .input-with-unit input[type="number"] {
+    width: 50px;
+    font-size: 0.8rem;
+  }
+
+  .input-with-unit .unit {
+    font-size: 0.7rem;
+  }
+
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Extra-Small Mobile Devices (max-width: 400px)
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 400px) {
+  .app-container {
+    padding: 6px 6px;
+    gap: 8px;
+  }
+
+  .app-header {
+    padding: 8px 10px;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .app-header h1 {
+    font-size: 0.95rem;
+  }
+
+  .mode-text {
+    font-size: 0.66rem;
+  }
+
+  .mode-cond {
+    font-size: 0.6rem;
+  }
+
+  .canvas-wrapper {
+    height: 230px;
+  }
+
+  .sim-canvas-container {
+    height: 125px;
+  }
+
+  .metrics-dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+
+  .metric-box {
+    padding: 6px;
+  }
+
+  .metric-value {
+    font-size: 0.96rem;
+  }
+
+  .vector-legend {
+    gap: 6px 8px;
+    font-size: 0.68rem;
+  }
+
+  .tag-arrow {
+    font-size: 0.78rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. Mobile Devices in Landscape Orientation (max-height: 540px and landscape)
+   -------------------------------------------------------------------------- */
+@media screen and (max-height: 540px) and (orientation: landscape) {
+  .app-container {
+    padding: 8px 14px;
+    gap: 8px;
+  }
+
+  .canvas-wrapper {
+    height: 220px;
+  }
+
+  .sim-canvas-container {
+    height: 120px;
+  }
+
+  .sidebar-panel {
+    max-height: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Touch & Coarse Pointer Accessibility
+   -------------------------------------------------------------------------- */
+@media screen and (pointer: coarse) {
+  .styled-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .time-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mode-btn,
+  .action-btn,
+  .view-tab-btn,
+  .toolbar-btn,
+  .ctrl-icon-btn,
+  .speed-btn {
+    min-height: 36px;
+  }
+
+  .toggle-item {
+    padding: 8px 6px;
+  }
+
+  .custom-check {
+    width: 18px;
+    height: 18px;
+  }
 }
